@@ -4,26 +4,35 @@ const bodyParser = require('body-parser')
 const authController = require('./controllers/authController')
 const firestoreController = require('./controllers/firestoreController')
 const http = require('http')
-const server = http.createServer(express())
-const {Server} = require('socket.io')
+//const server = http.createServer(express())
+//const {Server} = require('socket.io')
 
 const {doc, onSnapshot} = require('firebase/firestore')
 
 
-
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-
-    }
-})
-
 var globalSocket = ""
 
-app = express()
+var app = express()
 
 app.use(cors())
 app.use(bodyParser.json())
+
+//const server = http.createServer(app)
+//const s = io.listen(server)
+
+//const io = new Server(server, {
+  //  cors: {
+    //    origin: "*",
+
+    //}
+//})
+var PORT = process.env.PORT || 5000
+var server = require('http').createServer(app)
+var io = require('socket.io')(server, {
+    cors: {
+        origin: "*",
+    }
+})
 
 
 
@@ -37,9 +46,11 @@ io.on('connection', (socket) => {
     })
 })
 
-server.listen(8000, () => {
-    console.log('listening on 8000')
-})
+//server.listen(8000, () => {
+  //  console.log('listening on 8000')
+//})
+
+server.listen(PORT)
 
 app.get('/', (req, res) => {
     res.send('hello world')
@@ -83,7 +94,7 @@ app.post('/realms', async (req, res) => {
     res.send("realm created")
 })
 
-app.listen(5000, () => {
-    console.log('App is listening on port 5000')
-})
+//server.listen(5000, () => {
+    //console.log('App is listening on port 5000')
+//})
 
