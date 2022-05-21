@@ -26,7 +26,7 @@ app.use(bodyParser.json())
 
     //}
 //})
-var PORT = process.env.PORT || 5000
+var PORT = process.env.PORT
 var server = require('http').createServer(app)
 var io = require('socket.io')(server, {
     cors: {
