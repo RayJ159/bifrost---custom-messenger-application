@@ -87,7 +87,7 @@ app.post('/realms/:chatroom', async (req, res) => {
     console.log(text)
     console.log(req.params.chatroom)
     await firestoreController.addMessages(req.params.chatroom, email, text)
-    globalSocket.emit("updateMessages")
+    io.emit("updateMessages")
     res.send("Message added")
 })
 
