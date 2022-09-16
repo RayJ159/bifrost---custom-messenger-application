@@ -1,5 +1,6 @@
 const {getFirestore, collection, setDoc, addDoc, doc, getDocs} = require('firebase/firestore')
 const firebase = require('../db')
+const pool = require('../sqldb')
 
 const firestore = getFirestore(firebase)
 
@@ -36,11 +37,17 @@ async function createChatRoom(chatRoomName){
 
 async function addMessages(chatRoomName, email, text){
     try{
-        await addDoc(collection(firestore, '/realms/' + chatRoomName + '/messages'), {
-            name: email,
-            text: text,
-            time: Date.now(), 
-        })
+        //await addDoc(collection(firestore, '/realms/' + chatRoomName + '/messages'), {
+          //  name: email,
+            //text: text,
+            //time: Date.now(), 
+        //})
+
+        var queryString = `INSERT INTO ${chatRoomName} (email, messageText, messageTime) VALUES ('${email}', '${text}', '${Date.now()}')`
+
+        const newMessage = await pool.query(queryString)
+
+
         console.log("message added")
 
         return true
@@ -55,15 +62,18 @@ async function addMessages(chatRoomName, email, text){
 
 async function getMessages(chatRoomName){
     try{
-        var messages = []
+        //var messages = []
 
 
-        const querySnapshot = await getDocs(collection(firestore, "/realms/" + chatRoomName+"/messages"));
-        querySnapshot.forEach((doc) => {
-            messages.push(doc.data())
+        //const querySnapshot = await getDocs(collection(firestore, "/realms/" + chatRoomName+"/messages"));
+        //querySnapshot.forEach((doc) => {
+            //messages.push(doc.data())
 
-        })
-        return messages
+        //})
+
+        var queryString = `SELECT * FROM ${chatRoomName}`
+        var messages = await pool.query(queryString)
+        return messages.rows
         
 
     } catch (e) {

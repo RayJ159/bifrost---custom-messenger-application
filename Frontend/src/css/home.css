@@ -19,23 +19,25 @@ body {
 }
 
 .messages{
-    margin-left: 200px;
-    width:77%;
+    width: 100%;
+    padding-right: 5%;
+    padding-left: 1%;
+    overflow-y: scroll;
+  
+   
+  
     
     
    
     float:left;
-    height: 91vh;
+    height: 80vh;
+   
 }
 
-.item {
-    margin: 10px;
-}
 
 .messages ul {
     margin-top: 1vh;
-    overflow:hidden;
-    overflow-y: scroll;
+   
     list-style: none;
 }
 
@@ -50,8 +52,10 @@ li {
 }
 
 .textBox{
-    margin-left:230px;
-    margin-right:50px;
+    padding-left: 2%;
+    padding-right: 5%;
+
+ 
     
    
     bottom: 10px;
@@ -59,9 +63,7 @@ li {
 
 }
 
-.card{
-    
-}
+
 
 .realm{
     

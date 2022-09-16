@@ -4,7 +4,7 @@ import "../css/home.css"
 import axios from 'axios'
 import io from 'socket.io-client'
 
-import {useLocation, useNavigate} from "react-router-dom"
+import {createRoutesFromChildren, useLocation, useNavigate} from "react-router-dom"
 
 
 function Home(){
@@ -28,7 +28,7 @@ function Home(){
     .then(function(response){
         var messagesdata = response['data']
         messagesdata.sort((a,b)=>{
-            return parseInt(a['time'], 10) - parseInt(b['time'], 10)
+            return parseInt(a['messagetime'], 10) - parseInt(b['messagetime'], 10)
         })
         console.log(messagesdata)
         setMessages(messagesdata)
@@ -65,22 +65,22 @@ function Home(){
 
 
     return (<div className="wrapper">
-        <div className="sidebar">
-            <ul> 
-                <li className="realm">
-                
-                <a>
-                    <button onClick={
-                        ()=> {
-                            navigate("/", {replace: true})
-                        }
 
-                    } className="btn btn-outline-dark">Back</button>
-                </a>
-                </li>
-                
-            </ul>
-        </div>
+<nav class="navbar navbar-expand-lg bg-light">
+  <div class="container-fluid ">
+    <button onClick={()=>{
+        navigate('/');
+    }} class="btn btn-outline-dark" >Go Back</button>
+    
+    
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+        <button class="btn btn-outline-dark" type="submit">Search</button>
+      </form>
+    </div>
+  
+</nav>
+        
             <div className="messages">
                 <ul>
                 {messages.map((message)=> {
@@ -95,19 +95,29 @@ function Home(){
 
                     <div className="card">
                     <div className="card-header ">
-                        {message.name}
+                        {message['email']}
                     </div>
                     <div className="card-body">
                     <blockquote className="blockquote mb-0">
-                    <p>{message.text}</p>
+                    <p>{message['messagetext']}</p>
                     
                     </blockquote>
                     </div>
                     </div>
                     </li>
             })}
+            </ul>
+            <div ref={(e) => {
+                try{
+                    e.scrollIntoView()
+                } catch(e){
+
+                }
+            }}></div>
+        </div>
             
-        <li >
+       
+            
         <form className="textBox" onSubmit={(e) => {
             e.preventDefault();
             sendMessage(textVal);
@@ -125,9 +135,7 @@ function Home(){
             
         </div>
         </form>
-        </li>
-        </ul>
-        </div>
+        
         
     </div>);
     
