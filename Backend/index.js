@@ -69,6 +69,9 @@ app.post('/signin', async (req, res) => {
     console.log(req.body['user'])
     console.log(req.body['pass'])
     var uid = await authController.signInUser(req.body['user'], req.body['pass'])
+    if(uid != ""){
+        firestoreController.createChatRoom(req.body['user'].toString())
+    }
     console.log('chatroom created')
     res.json({uid: uid})
 
@@ -85,7 +88,8 @@ app.post('/realms/:chatroom', async (req, res) => {
     console.log(text)
     console.log(req.params.chatroom)
     await firestoreController.addMessages(req.params.chatroom, email, text)
-    io.emit("updateMessages")
+    io.emit(req.params.chatroom)
+    console.log(req.params.chatroom)
     res.send("Message added")
 })
 

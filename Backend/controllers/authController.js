@@ -6,7 +6,7 @@ const auth = getAuth(firebase)
 
 async function createUser(email, password){    
     var uid = ""
-    await createUserWithEmailAndPassword(auth, email, password)
+    await createUserWithEmailAndPassword(auth, email + "@test.com", password)
     .then((userCredential) => {
         const user = userCredential.user;
         uid = (user['uid'])
@@ -23,7 +23,7 @@ async function createUser(email, password){
 async function signInUser(email, password){
     var uid = ""
     
-    await signInWithEmailAndPassword(auth, email, password)
+    await signInWithEmailAndPassword(auth, email + "@test.com", password)
     .then((userCredential) => {
         const user = userCredential.user;
         //console.log(user)

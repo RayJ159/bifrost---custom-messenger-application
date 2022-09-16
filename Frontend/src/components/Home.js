@@ -9,12 +9,24 @@ import {createRoutesFromChildren, useLocation, useNavigate} from "react-router-d
 
 function Home(){
 
+    var url = "http://127.0.0.1:5000"
+    
+    const socket = io(`${url}/`)
+    
+
     const [messages, setMessages] = useState([])
     const [textVal, setTextVal] = useState([])
 
+    const [realmVal, setRealmVal] = useState("")
+
     const {state} = useLocation()
     const {email} = state
+    const [curRealm, setCurRealm] = useState(email)
 
+    const getNewMessage = () => {
+        console.log(curRealm)
+        updateMessages()
+    }
 
 
 
@@ -24,7 +36,7 @@ function Home(){
 
     function updateMessages() {
 
-        axios.get('https://bifrost-messenger.herokuapp.com/realms/test')
+        axios.get(`${url}/realms/${curRealm}`)
     .then(function(response){
         var messagesdata = response['data']
         messagesdata.sort((a,b)=>{
@@ -45,16 +57,18 @@ function Home(){
 
     }
   
+ 
     useEffect(() => {
-        const socket = io.connect("https://bifrost-messenger.herokuapp.com/")
-        socket.on('updateMessages', () => {
-            updateMessages()
-        })
-        updateMessages()       
-    }, [])
+        console.log(curRealm)
+        socket.on(curRealm, getNewMessage)
+        updateMessages()
+
+        // clean up the listener
+        return () => socket.off(curRealm, getNewMessage); 
+    }, [curRealm])
 
     function sendMessage(text){
-        axios.post('https://bifrost-messenger.herokuapp.com/realms/test', {email:email, text:text})
+        axios.post(`${url}/realms/${curRealm}`, {email:email, text:text})
         .then((e)=>{
             console.log(e)
         })
@@ -73,8 +87,16 @@ function Home(){
     }} class="btn btn-outline-dark" >Go Back</button>
     
     
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+      <form onSubmit={(e) => {
+            e.preventDefault();
+          
+            setCurRealm(realmVal);
+            
+            }} class="d-flex" role="search">
+        <input onChange={(e)=>{
+            setRealmVal(e.target.value);
+            
+        }} value={realmVal} class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
         <button class="btn btn-outline-dark" type="submit">Search</button>
       </form>
     </div>

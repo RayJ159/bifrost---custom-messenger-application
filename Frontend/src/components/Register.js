@@ -8,6 +8,8 @@ import "socket.io-client";
 
 function Register() {
 
+    var url = "http://127.0.0.1:5000";
+
     const [registered, setRegistered] = useState(true)
 
     const[email, setEmail] = useState("")
@@ -26,8 +28,8 @@ function Register() {
         <div className="form-floating">
           <input value={email} onChange={(e)=>{
             setEmail(e.target.value)
-          }} type="email" className="form-control" id="floatingInput" placeholder="name@example.com"/>
-          <label for="floatingInput">Email address</label>
+          }} type="text" className="form-control" id="floatingInput" placeholder="name@example.com"/>
+          <label for="floatingInput">username</label>
         </div>
 
         <div className="form-floating">
@@ -46,7 +48,7 @@ function Register() {
             { registered ?
 
             <button onClick={() => {
-              axios.post("https://bifrost-messenger.herokuapp.com/signin", {
+              axios.post(`${url}/signin`, {
                 user: email,
                 pass: pass
               }).then((e) => {
@@ -64,7 +66,7 @@ function Register() {
             }} className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
             :
             <button onClick={()=> {
-              axios.post("https://bifrost-messenger.herokuapp.com/register", {
+              axios.post(`${url}/register`, {
                 user: email,
                 pass: pass
               }).then(() => {
