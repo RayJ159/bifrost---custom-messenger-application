@@ -21,17 +21,20 @@ async function addUserEmail(uid, email) {
 
 async function createChatRoom(chatRoomName){
     try{
-        await setDoc(doc(firestore, "realms", chatRoomName), {})
-        await addDoc(collection(firestore, "realms/" + chatRoomName +"/messages"), {
-            name: "Realm Master",
-            text: "Welcome to this realm"
-        })
+        //await setDoc(doc(firestore, "realms", chatRoomName), {})
+        //await addDoc(collection(firestore, "realms/" + chatRoomName +"/messages"), {
+          //  name: "Realm Master",
+           // text: "Welcome to this realm"
+        //})
 
+        var queryString = `CREATE TABLE ${chatRoomName} (email VARCHAR(255), messageText VARCHAR(65535), messageTime BIGINT)`
+        const newTable = await pool.query(queryString)
+        console.log("table created")
         
     } catch(e) {
         console.log("error creating chat room")
     }
-    messageRef.addDoc();
+   
 
 }
 

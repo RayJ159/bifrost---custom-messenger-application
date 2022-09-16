@@ -49,9 +49,7 @@ io.on('connection', (socket) => {
     })
 })
 
-//server.listen(8000, () => {
-  //  console.log('listening on 8000')
-//})
+
 
 server.listen(PORT)
 
@@ -100,4 +98,5 @@ app.post('/realms', async (req, res) => {
 //server.listen(5000, () => {
     //console.log('App is listening on port 5000')
 //})
+
 
