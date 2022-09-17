@@ -71,6 +71,7 @@ function Home(){
     }, [curRealm])
 
     function sendMessage(text){
+        setMessages([...messages, {email:email,messagetext:text, messagetime: Date.now()}])
         axios.post(`${url}/realms/${curRealm}`, {email:email, text:text})
         .then((e)=>{
             console.log(e)
