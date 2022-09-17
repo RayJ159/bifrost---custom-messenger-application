@@ -9,9 +9,9 @@ import {createRoutesFromChildren, useLocation, useNavigate} from "react-router-d
 
 function Home(){
 
-    var url = "http://127.0.0.1:5000"
+    var url = "https://bifrost-messenger.herokuapp.com"
     
-    const socket = io(`${url}/`)
+   
     
 
     const [messages, setMessages] = useState([])
@@ -59,6 +59,9 @@ function Home(){
   
  
     useEffect(() => {
+
+        const socket = io.connect(`${url}/`)
+       
         console.log(curRealm)
         socket.on(curRealm, getNewMessage)
         updateMessages()
@@ -80,32 +83,43 @@ function Home(){
 
     return (<div className="wrapper">
 
-<nav class="navbar navbar-expand-lg bg-light">
-  <div class="container-fluid ">
-    <button onClick={()=>{
-        navigate('/');
-    }} class="btn btn-outline-dark" >Go Back</button>
-    
-    
-      <form onSubmit={(e) => {
-            e.preventDefault();
-          
-            setCurRealm(realmVal);
-            
-            }} class="d-flex" role="search">
-        <input onChange={(e)=>{
-            setRealmVal(e.target.value);
-            
-        }} value={realmVal} class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-dark" type="submit">Search</button>
-      </form>
+<div class="top-bar">
+    <div>
+    <button  onClick={()=>{
+        setCurRealm(email)
+    }} >Heimdall!</button>
     </div>
-  
-</nav>
+    
+    <div>
+    <form className = "search-bar" onSubmit={(e) => {
+        e.preventDefault();
+          
+        setCurRealm(realmVal);
+            
+        }}>
+        
+        <input type="text" onChange={(e)=>{
+        setRealmVal(e.target.value);
+            
+        }} value={realmVal} placeholder="Search Realm"/>
+        <input class="search-button" type="submit" value="Go"/>
+    </form>
+    </div>
+
+    <div>
+    <button  onClick={()=>{
+        navigate('/');
+    }} >Sign out</button>
+
+    </div>
+    </div>
         
             <div className="messages">
                 <ul>
                 {messages.map((message)=> {
+                var curDate = new Date(message["messagetime"]*1)
+              
+
                 return <li ref={(e) => {
                     try{
                         e.scrollIntoView()
@@ -115,15 +129,21 @@ function Home(){
                 }}>
                     
 
-                    <div className="card">
-                    <div className="card-header ">
-                        {message['email']}
+                    <div className="message-item">
+                    <div className="message-item-header">
+                    <div className="message-item-name">
+                        {message['email'] } 
                     </div>
-                    <div className="card-body">
-                    <blockquote className="blockquote mb-0">
+
+                    <div className="message-item-time">
+                        {curDate.getHours()+":"+curDate.getMinutes() +" "+ curDate.getDate()+"/"+(curDate.getMonth() + 1)+"/"+(curDate.getFullYear())}
+                    </div>
+                    </div>
+                    <div className="message-item-body">
+                  
                     <p>{message['messagetext']}</p>
                     
-                    </blockquote>
+                
                     </div>
                     </div>
                     </li>
@@ -140,22 +160,17 @@ function Home(){
             
        
             
-        <form className="textBox" onSubmit={(e) => {
+        <form className="messageBox" onSubmit={(e) => {
             e.preventDefault();
             sendMessage(textVal);
             setTextVal("")
 
             }}>
-        <div class="input-group mb-3" >
-            
             <input type="text" onChange={(e) => {
                 setTextVal(e.target.value)
                 console.log(e.target.value)
-            }} value={textVal} class="form-control" placeholder="Enter a message" aria-label="Enter a message" aria-describedby="button-addon2"/>
-            <button class="btn btn-outline-dark" type="submit" id="button-addon2">Send</button>
-         
-            
-        </div>
+            }} value={textVal} placeholder="Enter a message"/>
+            <input type="submit"  value = "SEND"/>
         </form>
         
         

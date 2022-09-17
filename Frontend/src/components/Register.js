@@ -8,13 +8,14 @@ import "socket.io-client";
 
 function Register() {
 
-    var url = "http://127.0.0.1:5000";
+    var url = "https://bifrost-messenger.herokuapp.com";
 
     const [registered, setRegistered] = useState(true)
 
     const[email, setEmail] = useState("")
     const[pass, setPass] = useState("")
     const navigate = useNavigate()
+    const [invalid, setInvalid] = useState(false)
 
     return(
 <div className="text-center body">
@@ -38,7 +39,9 @@ function Register() {
           }} type="password" className="form-control" id="floatingPassword" placeholder="Password"/>
           <label for="floatingPassword">Password</label>
         </div>
-      
+          {
+        invalid && <div><p className = "invalid-output">Invalid username or password entered.</p></div>
+       }
   
         <div className="checkbox mb-3">
           
@@ -57,6 +60,8 @@ function Register() {
                 
                 if(uid.length > 0){
                   navigate("../home", {state: {email:email}});
+                } else {
+                  setInvalid(true);
                 }
             }).catch((e) => {
               console.log(e)
@@ -80,14 +85,14 @@ function Register() {
         {
 
             registered?
-        <a  onClick={function() {
+        <button  onClick={function() {
             setRegistered(false)
 
-        }}> click here to register </a>
+        }} className="w-100 btn btn-lg btn-primary"> click here to register </button>
         :
-        <a onClick={function(){
+        <button onClick={function(){
             setRegistered(true)
-        }}>Click here to sign in </a>
+        }} className="w-100 btn btn-lg btn-primary">Click here to sign in </button>
 
     }
         <p className="mt-5 mb-3 text-muted">&copy; 2017–2022</p>

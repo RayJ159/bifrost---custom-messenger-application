@@ -7,11 +7,19 @@
   background-color: white;
   height: auto;
 }
+button {
+  margin-bottom: 2%;
+}
 
 .form-signin {
   max-width: 330px;
   padding: 15px;
 }
+
+.invalid-output {
+  color: #e63535;
+}
+
 
 .form-signin .form-floating:focus-within {
   z-index: 2;

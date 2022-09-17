@@ -1,13 +1,77 @@
 body {
-    background: white;
+    background: aliceblue;
+    padding:0;
+    margin:0;
 }
 
+.top-bar{
+  
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    height: 50px;
+    padding: 0.5%;
+    border-color: grey;
+    border-bottom-style: solid;
+    border-width: 0.5px;
+   
+    
+
+    
+}
+
+
+.top-bar button {
+    background-color: #146fe6;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    height: 100%;
+    width: 15vw;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    
+    
+
+}
+
+.top-bar form{
+    height: 100%;
+}
+.search-bar input{
+    display: inline;
+    height: 100%;
+    border: none;
+    background-color: aliceblue;
+  
+  
+}
+
+.search-bar input[type=text]{
+    border-radius: 5px 0 0 5px;
+   
+}
+
+.search-bar input[type=submit]{
+    border-radius: 0 5px 5px 0;
+    
+}
+
+.search-bar input[type=text]:focus{
+    border:none;
+    outline:none;
+   
+
+}
+
+    
 .wrapper .sidebar {
     
     float: left;
    
 
-    background: #f5f5f5;
+    background: white;
 
     position: fixed;
     top: 0;
@@ -20,10 +84,11 @@ body {
 
 .messages{
     width: 100%;
-    padding-right: 5%;
-    padding-left: 1%;
+    padding-right: 4vw;
+    padding-left: 1vw;
     overflow-y: scroll;
-  
+    
+   
    
   
     
@@ -37,6 +102,7 @@ body {
 
 .messages ul {
     margin-top: 1vh;
+    
    
     list-style: none;
 }
@@ -51,16 +117,47 @@ li {
 
 }
 
-.textBox{
-    padding-left: 2%;
-    padding-right: 5%;
-
- 
+.messageBox{
     
-   
     bottom: 10px;
+    position: fixed;
+    padding-left:4vw;
+    padding-right: 4vw;
+    
+    bottom: 0;
+    width: 100%;
+  
+    padding-bottom: 30px;
+    
+  
     
 
+    
+  
+}
+
+.messageBox input {
+    margin-top: 2%;
+    display: inline;
+}
+
+.messageBox input {
+    height: 6vh;
+    border: none;
+}
+.messageBox input[type=text]{
+    width: 90%;
+    border-radius: 5px 0 0 5px;
+  
+}
+
+.messageBox input[type=text]:focus{
+    outline:none;
+  
+}
+.messageBox input[type=submit]{
+    width:10%;
+    border-radius: 0 5px 5px 0;
 }
 
 
@@ -75,6 +172,50 @@ li {
 
 .btn {
     width: 130px;
+}
+
+.message-item{
+    padding: 1%;
+    border-radius: 5px;
+}
+.message-item-header{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: none;
+    padding: 0;
+   
+
+}
+
+.message-item-name{
+    font-weight: 700;
+}
+
+
+
+.message-item-body p {
+    font-size: 1rem;
+    font-weight: 300;
+ 
+    margin-top: 0;
+}
+.message-item-body{
+    padding:0;
+  
+   
+}
+
+.message-item-time {
+
+   
+    font-style: italic;
+    font-size: small;
+}
+
+.message-item{
+    background-color: white;
+    min-height: 70px;
+
 }
 
 
