@@ -70,8 +70,20 @@ app.post('/stream-offer', async (req, res) => {
     realm = req.body['realm']
     sdp = req.body['sdp']
     type = req.body['type']
+    viewer = req.body['viewer']
    
-    io.emit(realm+"-offer", {sdp:sdp, type:type});
+    io.emit(realm+"-offer", {sdp:sdp, type:type}, viewer);
+    res.send('hello')
+})
+
+
+app.post('/:realm/viewer', async (req, res) => {
+    console.log("streaming");
+    
+    realm = req.params.realm
+    viewer = req.body['viewer']
+   
+    io.emit(realm+"-viewer", {viewer:viewer});
     res.send('hello')
 })
 
@@ -81,8 +93,9 @@ app.post('/stream-answer', async (req, res) => {
     realm = req.body['realm']
     sdp = req.body['sdp']
     type = req.body['type']
+    viewer = req.body['viewer']
    
-    io.emit(realm+"-answer", {sdp:sdp, type:type});
+    io.emit(realm+"-answer", {sdp:sdp, type:type}, viewer);
     res.send('hello')
 })
 
@@ -92,9 +105,11 @@ app.post('/streamice', async (req, res) => {
     reqBody = req.body
    
     realm = reqBody['realm']
+    viewer = reqBody['viewer']
     delete reqBody['realm']
+    delete reqBody['viewer']
     console.log(reqBody)
-    io.emit(realm +"-ice", reqBody);
+    io.emit(realm +"-ice", reqBody, viewer);
     res.send('hello')
 
 })
