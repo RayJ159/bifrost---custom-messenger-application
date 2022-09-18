@@ -77,7 +77,7 @@ function Home(){
 
     }
 
-    var pc = null;
+    const [pc, setPc] = useState(null)
 
    
 
@@ -88,6 +88,25 @@ function Home(){
             console.log({...curCandidate, realm:email});
             axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
         })
+
+    
+
+        pcMap[key].oniceconnectionstatechange = function() {
+            if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
+                console.log('user disconnected')
+                delete pcMapTemp[key];
+                setPcMap(pcMapTemp)
+            }
+        }
+
+        pcMap[key].onsignalingstatechange = function() {
+            
+                console.log('user disconnected')
+                delete pcMapTemp[key];
+                setPcMap(pcMapTemp)
+            
+        }
+    
     
       
         stream.getTracks().forEach((track) => {
@@ -126,15 +145,24 @@ function Home(){
     
     }
 
+    useEffect(()=> {
+        const socket = io.connect(`${url}/`)
+        if(webcamRef.current.srcObject){
+            Object.keys(pcMap).forEach(async function(key) {
+                console.log(key)
+                await sendOffer(webcamRef.current.srcObject, key, socket)
+            })
+        }
+    }, [pcMap])
+
 
 
    
 
     useEffect(()=> {
         if(viewable){
-          
-
-            pc = new RTCPeerConnection(servers);
+            var pc = new RTCPeerConnection(servers);
+            setPc(pc)
             const socket = io.connect(`${url}/`)
 
             axios.post(`${url}/${curRealm}/viewer`, {viewer: email + '-' + curRealm});
@@ -184,6 +212,7 @@ function Home(){
                 console.log(pcMapTemp)
                 pcMapTemp[arg.viewer] = new RTCPeerConnection(servers)
                 setPcMap(pcMapTemp)
+                
             })
         }
     }, [viewable])
@@ -227,6 +256,13 @@ function Home(){
     <div>
     <button  onClick={()=>{
         setCurRealm(email)
+        if(streamRef.current){
+            streamRef.current.srcObject = null;
+        }
+        console.log('closed')
+        pc.close()
+        setPc(null)
+        setViewable(false)
     }} >Heimdall!</button>
     </div>
     
