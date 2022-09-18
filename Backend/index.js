@@ -65,6 +65,40 @@ app.post('/register', async (req, res) => {
     res.send('hello world')
 })
 
+app.post('/stream-offer', async (req, res) => {
+    console.log("streaming");
+    realm = req.body['realm']
+    sdp = req.body['sdp']
+    type = req.body['type']
+   
+    io.emit(realm+"-offer", {sdp:sdp, type:type});
+    res.send('hello')
+})
+
+
+app.post('/stream-answer', async (req, res) => {
+    console.log("streaming-answer");
+    realm = req.body['realm']
+    sdp = req.body['sdp']
+    type = req.body['type']
+   
+    io.emit(realm+"-answer", {sdp:sdp, type:type});
+    res.send('hello')
+})
+
+
+app.post('/streamice', async (req, res) => {
+    console.log("ice");
+    reqBody = req.body
+   
+    realm = reqBody['realm']
+    delete reqBody['realm']
+    console.log(reqBody)
+    io.emit(realm +"-ice", reqBody);
+    res.send('hello')
+
+})
+
 app.post('/signin', async (req, res) => {
     console.log(req.body['user'])
     console.log(req.body['pass'])

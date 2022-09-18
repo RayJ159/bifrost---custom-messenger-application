@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from "react"
+import React, {useState, useEffect, useRef} from "react"
+
 import "bootstrap/dist/css/bootstrap.css"
 import "../css/home.css"
 import axios from 'axios'
@@ -9,7 +10,28 @@ import {createRoutesFromChildren, useLocation, useNavigate} from "react-router-d
 
 function Home(){
 
-    var url = "https://bifrost-messenger.herokuapp.com"
+    
+
+    //var url = "https://bifrost-messenger.herokuapp.com"
+    var url = "http://localhost:5000"
+    const webcamRef = useRef();
+    const streamRef = useRef();
+
+    const [viewable, setViewable] = useState(false)
+
+    const servers = {
+        iceServers: [
+            {
+                urls: ['stun:stun1.l.google.com:19202', 'stun:stun2.l.google.com:19302'],
+
+            }],
+            iceCandidatePoolSize: 10,
+        
+    }
+
+    let pc = new RTCPeerConnection(servers);
+    let localStream = null
+    
     
    
     
@@ -56,11 +78,80 @@ function Home(){
     })
 
     }
+
+    useEffect(()=> {
+        if(viewable){
+         
+            const socket = io.connect(`${url}/`)
+
+            socket.on(curRealm + "-ice", async (arg) => {
+                console.log("ice")
+                const candidate = new RTCIceCandidate(arg)
+                await pc.addIceCandidate(candidate);
+                    
+            })
+
+            pc.onicecandidate = event => {
+                const curCandidate = event.candidate.toJSON();
+                console.log({...curCandidate, realm:curRealm});
+                axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm})
+            }
+    
+
+            pc.ontrack = event => {
+                if(streamRef.current.srcObject){
+                    return;
+                }
+
+                console.log(event.streams[0])
+
+                streamRef.current.srcObject = event.streams[0]
+                
+            }
+
+            socket.on(curRealm +"-offer", async (arg) => {
+                await pc.setRemoteDescription(new RTCSessionDescription(arg))
+                const answerDescription = await pc.createAnswer();
+                await pc.setLocalDescription(answerDescription);
+
+                const answer = {
+                    realm: curRealm,
+                    type: answerDescription.type,
+                    sdp: answerDescription.sdp
+                }
+                console.log(answer)
+
+                await axios.post(`${url}/stream-answer`, answer)
+            })
+
+            
+
+           
+    
+                
+    
+            
+
+
+            
+           
+
+        
+        }
+    }, [viewable])
+
+    
   
  
     useEffect(() => {
-
+        //localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
         const socket = io.connect(`${url}/`)
+        if(email != curRealm){
+            setViewable(true);
+        } 
+
+
+        
        
         console.log(curRealm)
         socket.on(curRealm, getNewMessage)
@@ -108,13 +199,75 @@ function Home(){
     </div>
 
     <div>
+    <button  onClick={async ()=>{
+        const socket = io.connect(`${url}/`)
+        const stream = await navigator.mediaDevices.getUserMedia({video:true});
+       
+        webcamRef.current.srcObject = stream;
+    
+        pc.onicecandidate = (event => {
+            const curCandidate = event.candidate.toJSON();
+            console.log({...curCandidate, realm:email});
+            axios.post(`${url}/streamice`, {...curCandidate, realm:email})
+        })
+
+      
+        stream.getTracks().forEach((track) => {
+            pc.addTrack(track, stream)
+        })
+    
+        const offerDescription = await pc.createOffer();
+        await pc.setLocalDescription(offerDescription)
+
+        const offer = {
+            realm: email,
+            sdp: offerDescription.sdp,
+            type: offerDescription.type,
+        }
+        console.log(offer);
+        axios.post(`${url}/stream-offer`, offer)
+
+        socket.on(email + "-answer", async (arg) => {
+            console.log(arg)
+           
+                const answerDsecription = new RTCSessionDescription(arg)
+                await pc.setRemoteDescription(answerDsecription);
+
+                
+        }) 
+
+        socket.on(email + "-ice", async (arg) => {
+            console.log(arg)
+            const candidate = new RTCIceCandidate(arg)
+            await pc.addIceCandidate(candidate);
+            
+        })
+
+        
+    
+       
+
+       
+    }}>Stream</button>
+
+    </div>
+
+    <div>
     <button  onClick={()=>{
         navigate('/');
     }} >Sign out</button>
 
     </div>
+
+    
+
     </div>
-        
+    <div className="videoDiv">
+        {(!viewable) && <video className="video" autoPlay ref={webcamRef} ></video>}
+        {(viewable) && <video className="video" autoPlay ref={streamRef}></video>}
+    </div>
+
+
             <div className="messages">
                 <ul>
                 {messages.map((message)=> {

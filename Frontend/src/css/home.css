@@ -82,11 +82,22 @@ body {
    
 }
 
+.video{
+    margin-top: 5px;
+    height:30vh;
+}
+
+.videoDiv{
+    text-align: center;
+}
 .messages{
     width: 100%;
     padding-right: 4vw;
     padding-left: 1vw;
     overflow-y: scroll;
+    position:fixed;
+    bottom: 10vh;
+    
     
    
    
@@ -95,7 +106,7 @@ body {
     
    
     float:left;
-    height: 80vh;
+    height: 50vh;
    
 }
 
