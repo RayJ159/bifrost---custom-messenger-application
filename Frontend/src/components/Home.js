@@ -13,8 +13,8 @@ function Home(){
 
     
 
-    //var url = "https://bifrost-messenger.herokuapp.com"
-    var url = "http://localhost:5000"
+    var url = "https://bifrost-messenger.herokuapp.com"
+    //var url = "http://localhost:5000"
 
     
     const webcamRef = useRef();
