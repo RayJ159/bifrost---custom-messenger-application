@@ -11,6 +11,8 @@ import {createRoutesFromChildren, useLocation, useNavigate} from "react-router-d
 
 function Home(){
 
+    const buffer = []
+
     
 
     var url = "https://bifrost-messenger.herokuapp.com"
@@ -26,14 +28,13 @@ function Home(){
 
     const servers = {
         iceServers: [
-            {
-                urls: 'turn:13.214.199.2:3478',
-                username:'turnuser',
-                credential:'turn456'
 
-            }],
-            iceCandidatePoolSize: 10,
-        
+    {
+      urls: ['stun:stun1.l.google.com:19302'],
+    }
+    ],
+    iceCandidatePoolSize:10,
+     
     } 
 
     const [messages, setMessages] = useState([])
@@ -89,6 +90,7 @@ function Home(){
             if(event.candidate){
             const curCandidate = event.candidate.toJSON();
             console.log({...curCandidate, realm:email});
+            pcMap[key].addIceCandidate(event.candidate);
             axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
             }
         })
@@ -134,6 +136,10 @@ function Home(){
                 console.log(arg)
                 const answerDsecription = new RTCSessionDescription(arg)
                 await pcMap[key].setRemoteDescription(answerDsecription);
+                console.log(buffer)
+                for(var i = 0; i < buffer.length; i++){
+                    await pcMap[key].addIceCandidate(buffer[i])
+                }
             }
                 
         }) 
@@ -142,8 +148,14 @@ function Home(){
             console.log(argb)
            
             if(argb == key){
+
                 const candidate = new RTCIceCandidate(arg)
-                await pcMap[key].addIceCandidate(candidate);
+                if(pcMap[key].currentRemoteDescription){
+                    console.log(arg)
+                    await pcMap[key].addIceCandidate(candidate);
+                } else {
+                    buffer.push(candidate)
+                }
             }
         })
 
@@ -185,6 +197,7 @@ function Home(){
             pc.onicecandidate = event => {
                 const curCandidate = event.candidate.toJSON();
                 console.log({...curCandidate, realm:curRealm});
+                pc.addIceCandidate(event.candidate);
                 axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
             }
             pc.ontrack = event => {
@@ -210,9 +223,9 @@ function Home(){
                     sdp: answerDescription.sdp
                 }
                 console.log(answer)
-
-                await axios.post(`${url}/stream-answer`, answer);
                 await pc.setLocalDescription(answerDescription);
+                await axios.post(`${url}/stream-answer`, answer);
+              
             }
             })
         } else {
