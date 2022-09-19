@@ -84,9 +84,11 @@ function Home(){
     async function sendOffer(stream,key, socket){
         
         pcMap[key].onicecandidate = (event => {
+            if(event.candidate){
             const curCandidate = event.candidate.toJSON();
             console.log({...curCandidate, realm:email});
             axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
+            }
         })
 
     
@@ -126,6 +128,7 @@ function Home(){
         axios.post(`${url}/stream-offer`, offer)
     
         socket.on(email + "-answer", async (arg, argb) => {
+           
             
             if(argb == key){
                 const answerDsecription = new RTCSessionDescription(arg)
@@ -135,6 +138,7 @@ function Home(){
         }) 
     
         socket.on(email + "-ice", async (arg, argb) => {
+            console.log(argb)
            
             if(argb == key){
                 const candidate = new RTCIceCandidate(arg)
@@ -193,7 +197,7 @@ function Home(){
 
                 await pc.setRemoteDescription(new RTCSessionDescription(arg))
                 const answerDescription = await pc.createAnswer();
-                await pc.setLocalDescription(answerDescription);
+               
 
                 const answer = {
                     viewer: email + '-' + curRealm,
@@ -204,6 +208,8 @@ function Home(){
                 console.log(answer)
 
                 await axios.post(`${url}/stream-answer`, answer)
+
+                await pc.setLocalDescription(answerDescription);
             }
             })
         } else {
