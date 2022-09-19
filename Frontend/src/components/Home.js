@@ -27,7 +27,9 @@ function Home(){
     const servers = {
         iceServers: [
             {
-                urls: 'stun:stun1.l.google.com:19302',
+                urls: 'turn:13.214.199.2:3478',
+                username:'turnuser',
+                credential:'turn456'
 
             }],
             iceCandidatePoolSize: 10,
