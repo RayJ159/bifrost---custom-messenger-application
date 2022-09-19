@@ -27,7 +27,7 @@ function Home(){
     const servers = {
         iceServers: [
             {
-                urls: ['stun:stun1.l.google.com:19202', 'stun:stun2.l.google.com:19302'],
+                urls: 'stun:stun1.l.google.com:19302',
 
             }],
             iceCandidatePoolSize: 10,
@@ -93,21 +93,21 @@ function Home(){
 
     
 
-        pcMap[key].oniceconnectionstatechange = function() {
-            if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
-                console.log('user disconnected')
-                delete pcMapTemp[key];
-                setPcMap(pcMapTemp)
-            }
-        }
+        // pcMap[key].oniceconnectionstatechange = function() {
+        //     if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
+        //         console.log('user disconnected')
+        //         delete pcMapTemp[key];
+        //         setPcMap(pcMapTemp)
+        //     }
+        // }
 
-        pcMap[key].onsignalingstatechange = function() {
+        // pcMap[key].onsignalingstatechange = function() {
             
-                console.log('user disconnected')
-                delete pcMapTemp[key];
-                setPcMap(pcMapTemp)
+        //         console.log('user disconnected')
+        //         delete pcMapTemp[key];
+        //         setPcMap(pcMapTemp)
             
-        }
+        // }
     
     
       
@@ -116,21 +116,20 @@ function Home(){
         })
     
         const offerDescription = await pcMap[key].createOffer();
-        await pcMap[key].setLocalDescription(offerDescription)
-    
         const offer = {
             realm: email,
             viewer: key,
             sdp: offerDescription.sdp,
             type: offerDescription.type,
         }
-        console.log(offer);
-        axios.post(`${url}/stream-offer`, offer)
-    
+        
+   
+     
         socket.on(email + "-answer", async (arg, argb) => {
            
             
             if(argb == key){
+                console.log(arg)
                 const answerDsecription = new RTCSessionDescription(arg)
                 await pcMap[key].setRemoteDescription(answerDsecription);
             }
@@ -145,6 +144,9 @@ function Home(){
                 await pcMap[key].addIceCandidate(candidate);
             }
         })
+
+        await axios.post(`${url}/stream-offer`, offer)
+        pcMap[key].setLocalDescription(offerDescription)
     
     
     }
@@ -207,8 +209,7 @@ function Home(){
                 }
                 console.log(answer)
 
-                await axios.post(`${url}/stream-answer`, answer)
-
+                await axios.post(`${url}/stream-answer`, answer);
                 await pc.setLocalDescription(answerDescription);
             }
             })
