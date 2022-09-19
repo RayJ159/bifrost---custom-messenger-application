@@ -25,6 +25,8 @@ function Home(){
     const [viewable, setViewable] = useState(false)
     const [pcMap, setPcMap] = useState({})
     const pcMapTemp = {}
+    const bufferMap = {}
+    const receiveMap = {}
 
     const servers = {
         iceServers: [
@@ -85,17 +87,22 @@ function Home(){
    
 
     async function sendOffer(stream,key, socket){
+        bufferMap[key] = []
+        receiveMap[key] = []
         
         pcMap[key].onicecandidate = (event => {
             if(event.candidate){
-            const curCandidate = event.candidate.toJSON();
-            console.log({...curCandidate, realm:email});
-            pcMap[key].addIceCandidate(event.candidate);
-            axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
+                const curCandidate = event.candidate.toJSON();
+                console.log({...curCandidate, realm:email});
+           
+                if(pcMap[key].currentRemoteDescription){
+                    axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
+                } else {
+                    bufferMap[key].push(curCandidate)
+                }
             }
         })
 
-    
 
         // pcMap[key].oniceconnectionstatechange = function() {
         //     if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
@@ -130,16 +137,21 @@ function Home(){
    
      
         socket.on(email + "-answer", async (arg, argb) => {
-           
-            
             if(argb == key){
                 console.log(arg)
                 const answerDsecription = new RTCSessionDescription(arg)
                 await pcMap[key].setRemoteDescription(answerDsecription);
-                console.log(buffer)
-                for(var i = 0; i < buffer.length; i++){
-                    await pcMap[key].addIceCandidate(buffer[i])
+
+                for(var i = 0; i < bufferMap[key].length; i++){
+                    await axios.post(`${url}/streamice`, {...bufferMap[key][i], realm:email, viewer:key})
                 }
+                
+                for(var i = 0; i < receiveMap[key].length; i++){
+                    await pcMap[key].addIceCandidate(receiveMap[i]);
+                } 
+                bufferMap[key] = []
+                receiveMap[key] = []
+              
             }
                 
         }) 
@@ -148,14 +160,13 @@ function Home(){
             console.log(argb)
            
             if(argb == key){
-
                 const candidate = new RTCIceCandidate(arg)
                 if(pcMap[key].currentRemoteDescription){
-                    console.log(arg)
                     await pcMap[key].addIceCandidate(candidate);
                 } else {
-                    buffer.push(candidate)
+                    receiveMap[key].push(candidate)
                 }
+            
             }
         })
 
@@ -181,6 +192,7 @@ function Home(){
 
     useEffect(()=> {
         if(viewable){
+            var bufferList = []
             var pc = new RTCPeerConnection(servers);
             setPc(pc)
             const socket = io.connect(`${url}/`)
@@ -195,10 +207,17 @@ function Home(){
                     }
             })
             pc.onicecandidate = event => {
+               if(event.candidate){
                 const curCandidate = event.candidate.toJSON();
                 console.log({...curCandidate, realm:curRealm});
-                pc.addIceCandidate(event.candidate);
-                axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
+           
+                
+                if(pc.currentRemoteDescription){
+                    axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
+                } else {
+                    bufferList.push(curCandidate)
+                }
+            }
             }
             pc.ontrack = event => {
                 if(streamRef.current.srcObject){
@@ -206,6 +225,19 @@ function Home(){
                 }
                 console.log(event.streams[0])
                 streamRef.current.srcObject = event.streams[0]
+            }
+
+            pc.onsignalingstatechange = async event => {
+                if(pc.currentRemoteDescription){
+                    console.log('x')
+               
+                    for(var i = 0; i < bufferList.length; i++){
+                        await axios.post(`${url}/streamice`, {...bufferList[i], realm:curRealm, viewer:email + '-' + curRealm})
+                    }   
+                    bufferList = []
+                    
+                }
+
             }
 
             socket.on(curRealm +"-offer", async (arg, argb) => {
@@ -225,9 +257,11 @@ function Home(){
                 console.log(answer)
                 await pc.setLocalDescription(answerDescription);
                 await axios.post(`${url}/stream-answer`, answer);
-              
+        
             }
             })
+
+
         } else {
             const socket = io.connect(`${url}/`)
             socket.on(email + '-viewer', (arg) => {
