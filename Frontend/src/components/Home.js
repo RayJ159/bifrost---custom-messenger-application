@@ -207,6 +207,7 @@ function Home(){
 
     useEffect(()=> {
         if(viewable){
+            var remoteStream = new MediaStream();
             var bufferList = []
             var pc = new RTCPeerConnection(servers);
             setPc(pc)
@@ -235,12 +236,20 @@ function Home(){
             }
             }
             pc.ontrack = event => {
-                if(streamRef.current.srcObject){
-                    return;
-                }
-                console.log(event.streams[0])
-                streamRef.current.srcObject = event.streams[0]
+                // if(streamRef.current.srcObject){
+                //     return;
+                // }
+                // console.log(event.streams[0])
+                // streamRef.current.srcObject = event.streams[0]
+
+                event.streams[0].getTracks().forEach(track => {
+                    remoteStream.addTrack(track)
+                })
+
+
             }
+
+            streamRef.current.srcObject = remoteStream;
 
             pc.onsignalingstatechange = async event => {
                 if(pc.currentRemoteDescription){
@@ -282,7 +291,7 @@ function Home(){
             socket.on(email + '-viewer', (arg) => {
                 console.log(pcMapTemp)
                 pcMapTemp[arg.viewer] = new RTCPeerConnection(servers)
-                setPcMap(pcMapTemp)
+                setPcMap(pcMapTemp)   
                 
             })
         }
@@ -357,7 +366,7 @@ function Home(){
     <button  onClick={async ()=>{
        
         const socket = io.connect(`${url}/`)
-        const stream = await navigator.mediaDevices.getUserMedia({video:true});
+        const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
         webcamRef.current.srcObject = stream;
         console.log(pcMap);
         Object.keys(pcMap).forEach(async function(key) {
