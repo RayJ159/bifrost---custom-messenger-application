@@ -32,22 +32,7 @@ function Home(){
         iceServers: [
 
             {
-                urls: "stun:openrelay.metered.ca:80",
-              },
-              {
-                urls: "turn:openrelay.metered.ca:80",
-                username: "openrelayproject",
-                credential: "openrelayproject",
-              },
-              {
-                urls: "turn:openrelay.metered.ca:443",
-                username: "openrelayproject",
-                credential: "openrelayproject",
-              },
-              {
-                urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                username: "openrelayproject",
-                credential: "openrelayproject",
+                urls: "stun:stun.l.google.com:19302",
               },
     ],
     iceCandidatePoolSize:10,
@@ -227,12 +212,9 @@ function Home(){
                 const curCandidate = event.candidate.toJSON();
                 console.log({...curCandidate, realm:curRealm});
            
-                
-                if(pc.currentRemoteDescription){
-                    axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
-                } else {
-                    bufferList.push(curCandidate)
-                }
+            
+                axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
+               
             }
             }
             pc.ontrack = event => {
@@ -251,18 +233,7 @@ function Home(){
 
             streamRef.current.srcObject = remoteStream;
 
-            pc.onsignalingstatechange = async event => {
-                if(pc.currentRemoteDescription){
-                    console.log('x')
-               
-                    for(var i = 0; i < bufferList.length; i++){
-                        await axios.post(`${url}/streamice`, {...bufferList[i], realm:curRealm, viewer:email + '-' + curRealm})
-                    }   
-                    bufferList = []
-                    
-                }
-
-            }
+           
 
             socket.on(curRealm +"-offer", async (arg, argb) => {
 
