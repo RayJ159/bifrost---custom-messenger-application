@@ -32,7 +32,7 @@ function Home(){
         iceServers: [
 
             {
-                urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun2.l.google.com:19302", "stun3.l.google.com:19302", "stun4.l.google.com:19302"],
+                urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"],
               },
     ],
     iceCandidatePoolSize:10,
@@ -93,11 +93,12 @@ function Home(){
         pcMap[key].onicecandidate = (event => {
             if(event.candidate){
                 const curCandidate = event.candidate.toJSON();
-                console.log({...curCandidate, realm:email});
+                //console.log({...curCandidate, realm:email});
            
                 if(pcMap[key].currentRemoteDescription){
                     axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
                 } else {
+                   
                     bufferMap[key].push(curCandidate)
                 }
             }
@@ -113,8 +114,8 @@ function Home(){
         }
 
         pcMap[key].onsignalingstatechange = function() {
-                if(pcMap[key].signalingState = 'closed'){
-                console.log('user disconnected')
+                if(pcMap[key].signalingState == 'closed'){
+                    console.log('user disconnected')
                     delete pcMapTemp[key];
                     setPcMap(pcMapTemp)
                 }
@@ -144,11 +145,13 @@ function Home(){
                 await pcMap[key].setRemoteDescription(answerDsecription);
 
                 for(var i = 0; i < bufferMap[key].length; i++){
+                    console.log({...bufferMap[key][i], realm:email});
                     await axios.post(`${url}/streamice`, {...bufferMap[key][i], realm:email, viewer:key})
                 }
                 
                 for(var i = 0; i < receiveMap[key].length; i++){
-                    await pcMap[key].addIceCandidate(receiveMap[i]);
+                    console.log(receiveMap[key])
+                    await pcMap[key].addIceCandidate(receiveMap[key][i]);
                 } 
                 bufferMap[key] = []
                 receiveMap[key] = []
