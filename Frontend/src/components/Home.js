@@ -32,7 +32,7 @@ function Home(){
         iceServers: [
 
             {
-                urls: "stun:stun.l.google.com:19302",
+                urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun2.l.google.com:19302", "stun3.l.google.com:19302", "stun4.l.google.com:19302"],
               },
     ],
     iceCandidatePoolSize:10,
@@ -337,7 +337,9 @@ function Home(){
     <button  onClick={async ()=>{
        
         const socket = io.connect(`${url}/`)
-        const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+        const stream = await navigator.mediaDevices.getUserMedia({video:{
+            height: {max: 480}
+        }, audio:true});
         webcamRef.current.srcObject = stream;
         console.log(pcMap);
         Object.keys(pcMap).forEach(async function(key) {
