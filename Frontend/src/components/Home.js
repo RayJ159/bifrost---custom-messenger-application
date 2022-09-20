@@ -104,21 +104,22 @@ function Home(){
         })
 
 
-        // pcMap[key].oniceconnectionstatechange = function() {
-        //     if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
-        //         console.log('user disconnected')
-        //         delete pcMapTemp[key];
-        //         setPcMap(pcMapTemp)
-        //     }
-        // }
+        pcMap[key].oniceconnectionstatechange = function() {
+            if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
+                console.log('user disconnected')
+                delete pcMapTemp[key];
+                setPcMap(pcMapTemp)
+            }
+        }
 
-        // pcMap[key].onsignalingstatechange = function() {
+        pcMap[key].onsignalingstatechange = function() {
+                if(pcMap[key].signalingState = 'closed'){
+                console.log('user disconnected')
+                    delete pcMapTemp[key];
+                    setPcMap(pcMapTemp)
+                }
             
-        //         console.log('user disconnected')
-        //         delete pcMapTemp[key];
-        //         setPcMap(pcMapTemp)
-            
-        // }
+        }
     
     
       
@@ -260,7 +261,7 @@ function Home(){
         } else {
             const socket = io.connect(`${url}/`)
             socket.on(email + '-viewer', (arg) => {
-                console.log(pcMapTemp)
+                console.log(arg.viewer)
                 pcMapTemp[arg.viewer] = new RTCPeerConnection(servers)
                 setPcMap(pcMapTemp)   
                 
