@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Runic&family=Noto+Serif+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&display=swap');
+
+.body {
+  display: inline;
+}
+
+.title {
+  font-size: 90px;
+  color: #ebdbb2;
+  margin-top: -16px;
+  font-family: 'Noto Sans Runic';
+}
+
+.welcome-message {
+  padding-bottom: 10px;
+  color: #ebdbb2;
+  font-size: 16px;
+}
+
+.sign {
+  border-width: 1px; 
+  padding: 20px 0 20px 0;
+  background-color: #bababa;
+  width: 100%;
+}
+.container-1 {
+  padding-top: 120px;
+
+}
+.request {
+  font-size: 16px;
+  padding-top: 20px;
+}
+
+.form-floating {
+  width: 60%;
+  align-content: center;
+}
+.sign-in {
+  width: 48%;
+  padding: 10px;
+  background-color: #35364A;
+  height: 100vh;
+}
+/** button **/
+.button {
+  background-color: #ebdbb2;
+  width: 60%;
+  position: relative;
+  border-radius: 6px;
+  color: black;
+  margin-bottom: 6%;
+}
+.button:hover {
+  background-color: grey;
+}
+.button:active {
+  background-color: grey;
+  box-shadow: 0 6px;
+  transform: translateY (3px);
+}
+
+.invalid-output {
+  color: #e63535; 
+  font-size: 16px;
+}
+
+
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-signin input[type="email"] {
+  margin-bottom: 10px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+a:hover {
+  color: #ebdbb2;
+}
+
+.buttons-reg-for {
+  display:inline-block;
+}
+.click-2, .click-3 {
+  text-decoration: underline;
+  border-style: none; 
+  color: white;
+  font-size: 12px;
+}
+
+
+.copyright {
+  font-family: 'Noto Serif Display', serif;
+  color: #ebdbb2;
+  font-size: 13px;
+}
+
