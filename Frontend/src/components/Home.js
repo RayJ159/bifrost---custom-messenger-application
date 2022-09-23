@@ -11,7 +11,6 @@ import {createRoutesFromChildren, useLocation, useNavigate} from "react-router-d
 
 function Home(){
 
-    const buffer = []
 
     
 
@@ -22,9 +21,9 @@ function Home(){
     const webcamRef = useRef();
     const streamRef = useRef();
 
+    const [streaming, setStreaming] = useState(false)
     const [viewable, setViewable] = useState(false)
     const [pcMap, setPcMap] = useState({})
-    const pcMapTemp = {}
     const bufferMap = {}
     const receiveMap = {}
 
@@ -32,10 +31,11 @@ function Home(){
         iceServers: [
 
             {
-                urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"],
-              },
+               urls: ["turn:13.214.199.2:3478"],
+               username: "a",
+               credential:"a"
+              }, 
     ],
-    iceCandidatePoolSize:10,
      
     } 
 
@@ -43,6 +43,7 @@ function Home(){
     const [textVal, setTextVal] = useState([])
 
     const [realmVal, setRealmVal] = useState("")
+
 
     const {state} = useLocation()
     const {email} = state
@@ -58,6 +59,76 @@ function Home(){
    
 
     const navigate = useNavigate()
+
+    function initPC() {
+            var pc = new RTCPeerConnection(servers);
+            setPc(pc)
+            const socket = io.connect(`${url}/`)
+
+           
+        
+            socket.on(curRealm + "-ice", async (arg, argb) => {
+                if(argb == email + '-' + curRealm ){
+                    console.log("ice")
+                    const candidate = new RTCIceCandidate(arg)
+                    await pc.addIceCandidate(candidate);
+                    }
+            })
+            pc.onicecandidate = event => {
+               if(event.candidate){
+                const curCandidate = event.candidate.toJSON();
+                console.log({...curCandidate, realm:curRealm});
+           
+            
+                axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
+               
+            }
+            }
+
+            var curDataChannel = pc.createDataChannel("")
+
+
+            curDataChannel.onclose = () => {
+                streamRef.current.srcObject = null
+                pc.close()
+                socket.off(curRealm + "-ice")
+                socket.off(curRealm +"-offer")
+                initPC();
+              
+            }
+            pc.ontrack = event => {
+                var remoteStream = new MediaStream()
+                event.streams[0].getTracks().forEach(track => {
+                    remoteStream.addTrack(track)
+                })
+                streamRef.current.srcObject = remoteStream;
+            }
+
+            
+
+           
+
+            socket.on(curRealm +"-offer", async (arg, argb) => {
+
+                if(argb == email + '-' + curRealm ){
+
+                await pc.setRemoteDescription(new RTCSessionDescription(arg))
+                const answerDescription = await pc.createAnswer();
+               
+
+                const answer = {
+                    viewer: email + '-' + curRealm,
+                    realm: curRealm,
+                    type: answerDescription.type,
+                    sdp: answerDescription.sdp
+                }
+               
+                await pc.setLocalDescription(answerDescription);
+                await axios.post(`${url}/stream-answer`, answer);
+        
+            }
+            })
+    }
 
     function updateMessages() {
 
@@ -87,58 +158,8 @@ function Home(){
    
 
     async function sendOffer(stream,key, socket){
-        bufferMap[key] = []
-        receiveMap[key] = []
-        
-        pcMap[key].onicecandidate = (event => {
-            if(event.candidate){
-                const curCandidate = event.candidate.toJSON();
-                //console.log({...curCandidate, realm:email});
-           
-                if(pcMap[key].currentRemoteDescription){
-                    axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
-                } else {
-                   
-                    bufferMap[key].push(curCandidate)
-                }
-            }
-        })
 
-
-        pcMap[key].oniceconnectionstatechange = function() {
-            if(pcMap[key].iceConnectionState == 'disconnected' || pcMap[key].iceConnectionState == 'closed'){
-                console.log('user disconnected')
-                delete pcMapTemp[key];
-                setPcMap(pcMapTemp)
-            }
-        }
-
-        pcMap[key].onsignalingstatechange = function() {
-                if(pcMap[key].signalingState == 'closed'){
-                    console.log('user disconnected')
-                    delete pcMapTemp[key];
-                    setPcMap(pcMapTemp)
-                }
-            
-        }
-    
-    
-      
-        stream.getTracks().forEach((track) => {
-            pcMap[key].addTrack(track, stream)
-        })
-    
-        const offerDescription = await pcMap[key].createOffer();
-        const offer = {
-            realm: email,
-            viewer: key,
-            sdp: offerDescription.sdp,
-            type: offerDescription.type,
-        }
-        
-   
-     
-        socket.on(email + "-answer", async (arg, argb) => {
+        var answerFunction = async (arg, argb) => {
             if(argb == key){
                 console.log(arg)
                 const answerDsecription = new RTCSessionDescription(arg)
@@ -158,9 +179,9 @@ function Home(){
               
             }
                 
-        }) 
-    
-        socket.on(email + "-ice", async (arg, argb) => {
+        }
+
+        var iceFunction = async (arg, argb) => {
             console.log(argb)
            
             if(argb == key){
@@ -172,7 +193,63 @@ function Home(){
                 }
             
             }
+        }
+
+
+
+        console.log('sending offer')
+        bufferMap[key] = []
+        receiveMap[key] = []
+        
+        pcMap[key].onicecandidate = (event => {
+            if(event.candidate){
+                const curCandidate = event.candidate.toJSON();
+                //console.log({...curCandidate, realm:email});
+           
+                if(pcMap[key].currentRemoteDescription){
+                    axios.post(`${url}/streamice`, {...curCandidate, realm:email, viewer:key})
+                } else {
+                   
+                    bufferMap[key].push(curCandidate)
+                }
+            }
         })
+
+
+        var curDataChannel = pcMap[key].createDataChannel("")
+        
+        
+        curDataChannel.onclose = function () {
+            console.log('user disconnected')
+            pcMap[key].close()
+            pcMap[key].onicecandidate = null
+            socket.off(email + "-answer", answerFunction) 
+            socket.off(email + "-ice", iceFunction)
+
+            if(streaming){
+                delete pcMap[key];
+                setPcMap(pcMap)
+            }
+
+        }
+
+      
+        stream.getTracks().forEach((track) => {
+            pcMap[key].addTrack(track, stream)
+        })
+    
+        const offerDescription = await pcMap[key].createOffer();
+        const offer = {
+            realm: email,
+            viewer: key,
+            sdp: offerDescription.sdp,
+            type: offerDescription.type,
+        }
+        
+   
+        
+        socket.on(email + "-answer", answerFunction) 
+        socket.on(email + "-ice", iceFunction)
 
         await axios.post(`${url}/stream-offer`, offer)
         pcMap[key].setLocalDescription(offerDescription)
@@ -196,77 +273,24 @@ function Home(){
 
     useEffect(()=> {
         if(viewable){
-            var remoteStream = new MediaStream();
-            var bufferList = []
-            var pc = new RTCPeerConnection(servers);
-            setPc(pc)
             const socket = io.connect(`${url}/`)
-
+            socket.on(curRealm+"-streaming", ()=> {
+                axios.post(`${url}/${curRealm}/viewer`, {viewer: email + '-' + curRealm});
+            })
             axios.post(`${url}/${curRealm}/viewer`, {viewer: email + '-' + curRealm});
-            
-            socket.on(curRealm + "-ice", async (arg, argb) => {
-                if(argb == email + '-' + curRealm ){
-                    console.log("ice")
-                    const candidate = new RTCIceCandidate(arg)
-                    await pc.addIceCandidate(candidate);
-                    }
-            })
-            pc.onicecandidate = event => {
-               if(event.candidate){
-                const curCandidate = event.candidate.toJSON();
-                console.log({...curCandidate, realm:curRealm});
-           
-            
-                axios.post(`${url}/streamice`, {...curCandidate, realm:curRealm, viewer:email + '-' + curRealm})
-               
-            }
-            }
-            pc.ontrack = event => {
-                // if(streamRef.current.srcObject){
-                //     return;
-                // }
-                // console.log(event.streams[0])
-                // streamRef.current.srcObject = event.streams[0]
-
-                event.streams[0].getTracks().forEach(track => {
-                    remoteStream.addTrack(track)
-                })
-
-
-            }
-
-            streamRef.current.srcObject = remoteStream;
-
-           
-
-            socket.on(curRealm +"-offer", async (arg, argb) => {
-
-                if(argb == email + '-' + curRealm ){
-
-                await pc.setRemoteDescription(new RTCSessionDescription(arg))
-                const answerDescription = await pc.createAnswer();
-               
-
-                const answer = {
-                    viewer: email + '-' + curRealm,
-                    realm: curRealm,
-                    type: answerDescription.type,
-                    sdp: answerDescription.sdp
-                }
-                console.log(answer)
-                await pc.setLocalDescription(answerDescription);
-                await axios.post(`${url}/stream-answer`, answer);
-        
-            }
-            })
-
-
+            initPC();
+    
         } else {
             const socket = io.connect(`${url}/`)
             socket.on(email + '-viewer', (arg) => {
                 console.log(arg.viewer)
-                pcMapTemp[arg.viewer] = new RTCPeerConnection(servers)
-                setPcMap(pcMapTemp)   
+                
+                if(!pcMap.hasOwnProperty(arg.viewer)){
+                    setPcMap({...pcMap, [arg.viewer] : new RTCPeerConnection(servers)})
+                }
+
+                // pcMapTemp[arg.viewer] = new RTCPeerConnection(servers)
+                // setPcMap(pcMapTemp)   
                 
             })
         }
@@ -282,10 +306,6 @@ function Home(){
             setViewable(true);
         } 
 
-
-        
-       
-        console.log(curRealm)
         socket.on(curRealm, getNewMessage)
         updateMessages()
 
@@ -310,6 +330,7 @@ function Home(){
 <div class="top-bar">
     <div>
     <button  onClick={()=>{
+        const socket = io.connect(`${url}/`)
         setCurRealm(email)
         if(streamRef.current){
             streamRef.current.srcObject = null;
@@ -318,6 +339,8 @@ function Home(){
         pc.close()
         setPc(null)
         setViewable(false)
+        socket.off(curRealm + "-ice")
+        socket.off(curRealm +"-offer")
     }} >Heimdall!</button>
     </div>
     
@@ -338,21 +361,42 @@ function Home(){
     </div>
 
     <div>
-    <button  onClick={async ()=>{
-       
+    {(!viewable) ? ((streaming)?<button onClick={() => {
+        webcamRef.current.srcObject.getTracks().forEach(function(track) {
+            track.stop()
+        })
+        setStreaming(false)
+        var tempMap = {}
+        Object.keys(pcMap).forEach(async function(key) {  
+            tempMap[key] = new RTCPeerConnection();
+            pcMap[key].close();
+        })
+        setPcMap(tempMap)
+        webcamRef.current.srcObject = null
+  
+    }
+
+    }>Stop Stream</button>: <button  onClick={async ()=>{
         const socket = io.connect(`${url}/`)
-        const stream = await navigator.mediaDevices.getUserMedia({video:{
-            height: {max: 480}
-        }, audio:true});
+        const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width: 1920, height:1080}, audio:true});
         webcamRef.current.srcObject = stream;
+        axios.post(`${url}/realms/${email}/streaming`);
         console.log(pcMap);
         Object.keys(pcMap).forEach(async function(key) {
-            
             console.log(key)
             await sendOffer(stream, key, socket)
         })
 
-    }}>Stream</button>
+        setStreaming(true)
+
+    }}>Stream</button>):(<button onClick={() => {
+
+    }}> 
+        Join Stream
+    </button>)
+
+}
+    
 
     </div>
 
@@ -367,7 +411,7 @@ function Home(){
 
     </div>
     <div className="videoDiv">
-        {(!viewable) && <video className="video" autoPlay ref={webcamRef} ></video>}
+        {(!viewable) && <video className="video" muted autoPlay ref={webcamRef} ></video>}
         {(viewable) && <video className="video" autoPlay ref={streamRef}></video>}
     </div>
 

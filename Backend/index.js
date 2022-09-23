@@ -76,6 +76,11 @@ app.post('/stream-offer', async (req, res) => {
     res.send('hello')
 })
 
+app.post('/realms/:realm/streaming', async (req, res)=> {
+    io.emit(req.params.realm+"-streaming")
+    res.send('hello')
+})
+
 
 app.post('/:realm/viewer', async (req, res) => {
     console.log("streaming");

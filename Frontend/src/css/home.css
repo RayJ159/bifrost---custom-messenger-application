@@ -130,8 +130,9 @@ li {
 
 .messageBox{
     
+    
     bottom: 10px;
-    position: fixed;
+    position: absolute;
     padding-left:4vw;
     padding-right: 4vw;
     
@@ -228,6 +229,67 @@ li {
     min-height: 70px;
 
 }
+
+.messages::-webkit-scrollbar {
+    display: none;
+}
+
+@media only screen and (orientation: landscape) {
+    .videoDiv{
+    
+    
+        width: 70vw;
+        height: 100%;
+    
+        
+    }
+    .video{
+       
+        display: block;
+        margin-left: 2vw;
+        margin-top: 5vh;
+        width: 70vw;
+        height: 80vh;
+    }
+
+    .messages {
+        width: 30vw;
+        height: 80%;
+        position: absolute;
+        right: 0;
+        padding-right: 10px;
+    }
+
+    .messageBox {
+        
+        position: absolute;
+        right: 0;
+        width: 30%;
+        height: 10%;
+        padding-right:1vw;
+  
+    }
+
+    .messageBox input[type=text]{
+        width: 70%;
+        border-radius: 5px 0 0 5px;
+      
+      
+    }
+
+    .messageBox input[type=submit]{
+        width:30%;
+        border-radius: 0 5px 5px 0;
+    }
+    
+
+
+
+   
+
+}
+
+
 
 
 
