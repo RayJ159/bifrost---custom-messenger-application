@@ -103,3 +103,9 @@ a:hover {
   font-size: 13px;
 }
 
+@media  (width < 761px){
+  .sign-in{
+    width: 100%;
+  }
+}
+
