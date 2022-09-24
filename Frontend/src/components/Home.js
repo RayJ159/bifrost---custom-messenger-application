@@ -20,6 +20,7 @@ function Home(){
     
     const webcamRef = useRef();
     const streamRef = useRef();
+    const [facing, setFacing] = useState('user')
 
     const [streaming, setStreaming] = useState(false)
     const [viewable, setViewable] = useState(false)
@@ -90,9 +91,10 @@ function Home(){
 
             curDataChannel.onclose = () => {
                 streamRef.current.srcObject = null
-                pc.close()
                 socket.off(curRealm + "-ice")
                 socket.off(curRealm +"-offer")
+                pc.off()
+                setPc(null)
                 initPC();
               
             }
@@ -378,7 +380,7 @@ function Home(){
 
     }>Stop Stream</button>: <button  onClick={async ()=>{
         const socket = io.connect(`${url}/`)
-        const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width: 1920, height:1080}, audio:true});
+        const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing, width: 1920, height:1080}, audio:true});
         webcamRef.current.srcObject = stream;
         axios.post(`${url}/realms/${email}/streaming`);
         console.log(pcMap);
@@ -410,13 +412,25 @@ function Home(){
     
 
     </div>
+    <div className="mainBody">
     <div className="videoDiv">
         {(!viewable) && <video className="video" muted autoPlay ref={webcamRef} ></video>}
         {(viewable) && <video className="video" autoPlay ref={streamRef}></video>}
+        {(!viewable) && <button onClick={
+            () => {
+                if(facing == 'user'){
+                    setFacing('environment')
+                } else {
+                    setFacing('user')
+                }
+            
+                
+            }
+        }>{(facing == "user")? "Front camera":"Back camera"}</button>
+        }
     </div>
-
-
-            <div className="messages">
+    <div className="messageSystem">
+        <div className="messages">
                 <ul>
                 {messages.map((message)=> {
                 var curDate = new Date(message["messagetime"]*1)
@@ -455,17 +469,14 @@ function Home(){
                 try{
                     e.scrollIntoView()
                 } catch(e){
-
                 }
             }}></div>
         </div>
-            
-       
-            
-        <form className="messageBox" onSubmit={(e) => {
-            e.preventDefault();
-            sendMessage(textVal);
-            setTextVal("")
+        <div className="messageBoxDiv"> 
+            <form className="messageBox" onSubmit={(e) => {
+                e.preventDefault();
+                sendMessage(textVal);
+                setTextVal("")
 
             }}>
             <input type="text" onChange={(e) => {
@@ -474,8 +485,11 @@ function Home(){
             }} value={textVal} placeholder="Enter a message"/>
             <input type="submit"  value = "SEND"/>
         </form>
+        </div>
+    </div>
         
         
+    </div>
     </div>);
     
         

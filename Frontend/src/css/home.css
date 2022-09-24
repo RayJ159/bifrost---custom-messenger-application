@@ -2,6 +2,16 @@ body {
     background: aliceblue;
     padding:0;
     margin:0;
+ 
+}
+
+.mainBody{
+    display: flex;
+    flex-direction: column;
+    height: 50vh;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
 }
 
 .top-bar{
@@ -10,6 +20,9 @@ body {
     display: flex;
     justify-content: space-between;
     height: 50px;
+    margin: 0;
+    width: 100%;
+  
     padding: 0.5%;
     border-color: grey;
     border-bottom-style: solid;
@@ -30,7 +43,7 @@ body {
     width: 15vw;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    display: inline;
     
     
 
@@ -38,6 +51,7 @@ body {
 
 .top-bar form{
     height: 100%;
+    width: 100%;
 }
 .search-bar input{
     display: inline;
@@ -50,11 +64,13 @@ body {
 
 .search-bar input[type=text]{
     border-radius: 5px 0 0 5px;
+    width: 80%;
    
 }
 
 .search-bar input[type=submit]{
     border-radius: 0 5px 5px 0;
+    width: 20%;
     
 }
 
@@ -84,35 +100,62 @@ body {
 
 .video{
     margin-top: 5px;
-    height:30vh;
+    width: 100%;
+    height: 80%;
+ 
+
 }
 
 .videoDiv{
+    flex:1;
+
+    width: 100%;
+    height: 100%;
+
     text-align: center;
 }
+
+.videoDiv button{
+    display: block;
+    margin: 0 auto;
+    background-color: #146fe6;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.messageSystem{
+    flex: 1;
+    height: 100%;
+
+}
+
 .messages{
-    width: 100%;
-    padding-right: 4vw;
+    height: 100%;
+
+    display: block;
+    width: 100vw;
+
+    padding-right: 1vw;
     padding-left: 1vw;
     overflow-y: scroll;
-    position:fixed;
-    bottom: 10vh;
-    
-    
+    margin-bottom: 10px;
    
+
    
-  
-    
-    
-   
-    float:left;
-    height: 50vh;
    
 }
 
 
 .messages ul {
+    display: block;
+    padding: 0;
+    margin: 0;
     margin-top: 1vh;
+    
     
    
     list-style: none;
@@ -123,28 +166,23 @@ li {
 }
 
 .messages ul li {
+    display: block;
+    padding: 0;
     margin-top: 1vh;
     margin-bottom: 1vh;
 
 }
 
+
+.messageBoxDiv {
+    display: block;
+}
 .messageBox{
-    
-    
-    bottom: 10px;
-    position: absolute;
+
     padding-left:4vw;
     padding-right: 4vw;
-    
-    bottom: 0;
     width: 100%;
-  
     padding-bottom: 30px;
-    
-  
-    
-
-    
   
 }
 
@@ -235,39 +273,51 @@ li {
 }
 
 @media only screen and (orientation: landscape) {
+    .mainBody{
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+    }
     .videoDiv{
-    
-    
-        width: 70vw;
-        height: 100%;
+       flex:3;
+        
+        padding: 10px;        
+        height: 90vh;
     
         
     }
     .video{
-       
-        display: block;
-        margin-left: 2vw;
-        margin-top: 5vh;
-        width: 70vw;
+        
         height: 80vh;
+        width: 100%;
+     
     }
 
-    .messages {
-        width: 30vw;
-        height: 80%;
-        position: absolute;
-        right: 0;
+    .messageSystem {
+        flex:1;
+       
+        display: flex;
+        flex-direction: column;
+    
+     
+        height: 90vh;
+      
         padding-right: 10px;
     }
 
+    .messages{
+        width: 100%;
+        flex:1;
+      
+       
+    }
+
     .messageBox {
-        
-        position: absolute;
-        right: 0;
-        width: 30%;
-        height: 10%;
-        padding-right:1vw;
-  
+        flex: 1;
+     
+        padding: 0;
+    
+        width: 100%;
     }
 
     .messageBox input[type=text]{
@@ -281,6 +331,8 @@ li {
         width:30%;
         border-radius: 0 5px 5px 0;
     }
+
+    
     
 
 
