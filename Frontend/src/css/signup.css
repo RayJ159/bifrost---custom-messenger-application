@@ -1,0 +1,77 @@
+.container-2 {
+  width: 100%;
+  height: 110vh;
+  position: absolute;
+  padding: 8%;
+}
+.left-box {
+  width: 50%;
+  height: 100%;
+  align-content: center;
+  background-color: #35364A;
+
+}
+.right-box {
+  background-color: #A2A8AE;
+  width: 50%;
+  height: 100%;
+}
+
+.header {
+  text-align: center;
+  padding: 30% 0 30% 0;
+}
+
+.title {
+  font-size: 90px;
+  color: #ebdbb2;
+  margin-top: -16px;
+  font-family: 'Noto Sans Runic';
+}
+
+.signup-message-1, .signup-message-2 {
+  color: #ebdbb2;
+  }
+.signup-message-1 {
+  padding: 0 0 40px 0;
+}
+.signup-message-2 {
+  padding: 30px 0 0 0;
+  font-size: 40px;
+  margin-top: -20px;
+}
+
+.form-register {
+  padding-top: 48%;
+  width: 100%;
+}
+
+
+.button-signup {
+  background-color: #ebdbb2;
+  width: 30%;
+  position: absolute;
+  border-radius: 6px;
+  color: black;
+  margin: 3% 0 0 5.1%;
+
+  }
+
+.button:hover {
+    background-color: grey;
+  }
+.button:active {
+    background-color: grey;
+    box-shadow: 0 6px;
+    transform: translateY (3px);
+  }
+.copyright-2 {
+  font-family: 'Noto Serif Display', serif;
+  color: #ebdbb2;
+  font-size: 13px;
+  padding-top: 80px;
+}
+.disclaimer {
+  font-size: xx-small;
+  padding: 20% 0 0 16px;
+}
