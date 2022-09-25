@@ -5,14 +5,7 @@ body {
  
 }
 
-.mainBody{
-    display: flex;
-    flex-direction: column;
-    height: 50vh;
-    width: 100vw;
-    padding: 0;
-    margin: 0;
-}
+
 
 .top-bar{
   
@@ -57,7 +50,7 @@ body {
     display: inline;
     height: 100%;
     border: none;
-    background-color: aliceblue;
+    background-color: white;
   
   
 }
@@ -81,23 +74,6 @@ body {
 
 }
 
-    
-.wrapper .sidebar {
-    
-    float: left;
-   
-
-    background: white;
-
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 200px;
-    height: 100%;
-    padding: 20px 0;
-   
-}
-
 .video{
     margin-top: 5px;
     width: 100%;
@@ -106,51 +82,52 @@ body {
 
 }
 
+.wrapper {
+    height: 100vh;
+    width: 100vw;
+ 
+
+}
+
+
+
 .videoDiv{
-    flex:1;
-
     width: 100%;
-    height: 100%;
-
+    height:40vh;
     text-align: center;
 }
 
 .videoDiv button{
     display: block;
     margin: 0 auto;
-    background-color: #146fe6;
+    background-color: #ebdbb2;
     border: none;
     border-radius: 5px;
-    color: white;
+    color: black;
     text-align: center;
     text-decoration: none;
     display: inline-block;
 }
 
 .messageSystem{
-    flex: 1;
-    height: 100%;
+    width: 100vw;
+    height: 50vh;
 
 }
 
 .messages{
-    height: 100%;
-
     display: block;
-    width: 100vw;
-
+    width: 100%;
+    height: 90%;
     padding-right: 1vw;
     padding-left: 1vw;
-    overflow-y: scroll;
-    margin-bottom: 10px;
-   
-
-   
+    overflow-y: scroll; 
    
 }
 
 
 .messages ul {
+   
     display: block;
     padding: 0;
     margin: 0;
@@ -175,9 +152,12 @@ li {
 
 
 .messageBoxDiv {
+    width: 100%;
     display: block;
+  
 }
 .messageBox{
+
 
     padding-left:4vw;
     padding-right: 4vw;
@@ -293,35 +273,41 @@ li {
      
     }
 
+   
     .messageSystem {
-        flex:1;
-       
-        display: flex;
-        flex-direction: column;
-    
      
-        height: 90vh;
+        flex:1;
+     
+        height: calc(100vh - 50px);
+     
       
-        padding-right: 10px;
+        padding-top: 5px;
+        margin: 0;
     }
 
     .messages{
         width: 100%;
-        flex:1;
-      
-       
+        height: 90%;
+    
     }
 
-    .messageBox {
-        flex: 1;
+    .messageBoxDiv {
+        position: static;
+    
      
         padding: 0;
-    
         width: 100%;
+    
+    }
+
+    .messageBox{
+        padding-left: 1vw;
+        padding-right: 1vw;
     }
 
     .messageBox input[type=text]{
         width: 70%;
+
         border-radius: 5px 0 0 5px;
       
       
